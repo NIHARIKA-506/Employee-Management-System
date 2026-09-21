@@ -1,0 +1,475 @@
+
+step26:
+-------
+	Set the background to App.jsx file.
+
+App.jsx
+-------
+import {BrowserRouter,Routes,Route, Navigate} from 'react-router-dom';
+import Header from './components/Header.jsx';
+import Login  from './components/Login.jsx';
+import Footer from './components/Footer.jsx';
+import EmployeeList from './components/EmployeeList.jsx';
+
+function PrivateRouter({children})
+{
+    return localStorage.getItem("logged") ? children : <Navigate to="/login"></Navigate>
+}
+
+function App()
+{
+    return(
+      <div className='bg-color'>
+         <BrowserRouter>
+            <Header/>
+            <Routes>
+                <Route path='/login' element={<Login/>}></Route>
+
+                /* protected pages */
+                <Route exact path='/' element={<PrivateRouter><EmployeeList/></PrivateRouter>}></Route>
+            </Routes>
+            <Footer/>
+         </BrowserRouter> 
+      </div>
+    )
+}
+export default App;
+
+step27:
+-------
+	Add the code inside App.css file.
+
+App.css
+------
+.footer
+{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #ecf0f1;
+  text-align: center;
+  font-weight: bold;
+  line-height: 30px;
+}
+.bg-color
+{
+   height: 100vh;
+   background:  linear-gradient(cyan,blue);
+}
+
+step28:
+-------
+	Create a "services" folder inside "src" folder.
+
+step29:
+-------
+	Create a "AuthService.jsx" file inside "src/services" folder.
+
+AuthService.jsx
+---------------
+import axios from 'axios';
+const AUTH_API = "http://localhost:9191/auth/api/login";
+
+class AuthService
+{
+    login(user)
+    {
+        return axios.post(AUTH_API,user);
+    }    
+}
+export default new AuthService();
+
+
+
+step30:
+------
+	Goto Login.jsx file and write below code.
+
+Login.jsx
+---------
+import { useState } from "react";
+import AuthService from "../services/AuthService";
+import { useNavigate } from "react-router-dom";
+
+function Login()
+{
+    const [user,setUser] = useState({username:"",password:""})
+    const [error,setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleLogin = (e)=>{
+        e.preventDefault();
+
+        AuthService.login(user).then(res=>{
+            if(res.data == true)
+            {
+                localStorage.setItem("logged", true);
+                navigate("/");
+            }
+            else
+            {
+                setError("Invalid Username and Password");
+            }
+        })
+
+    }
+
+    return(
+        <div className="container mt-5 p-5">
+            <div className="card mt-4 p-5 w-50 offset-3">
+
+                <h3 className="text-center"> Login </h3>
+
+                <label className="my-2"> UserName:</label>
+                <input type="text" name="username" className="form-control" autoComplete="off"
+                value={user.username}
+                onChange={(e)=> setUser({...user, username: e.target.value})}/>
+
+                <label className="my-2"> Password:</label>
+                <input type="password" name="password" className="form-control" autoComplete="off"
+                value={user.password}
+                onChange={(e)=> setUser({...user, password: e.target.value})}/>
+
+                {error  && <small className="text-center text-danger">{error}</small>}
+
+                <button className="btn btn-primary w-100 mt-4" onClick={handleLogin}> login </button>    
+            </div>
+        </div>
+    )
+}
+export default Login;
+
+
+step31:
+------
+	Open a new terminal and switch to the project.
+	ex:
+		cd frontend
+
+step32:
+-------
+	Install react-simple-typewriter package.
+	ex:
+		npm install react-simple-typewriter
+	
+step33:
+-------
+	Write typewriter effect code inside EmployeeList.jsx file.
+
+EmployeeList.jsx
+-----------------
+import {useTypewriter, Cursor} from 'react-simple-typewriter';
+import { useState } from 'react';
+function EmployeeList()
+{
+    const [employee,setEmployee]= useState([]);
+
+    const [value] = useTypewriter({
+        words : ["Details", "List", "Info"],
+        loop : true,
+        typeSpeed : 120,
+        deleteSpeed : 80
+    })
+    return(
+        <div className="container mt-5 p-5">
+            <h4 className="text-center"> Employee {value} <Cursor/> </h4>
+            <div className='row mt-5'>
+                <table className='table table-bordered table-striped'>
+                    <thead>
+                        <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>DOJ</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            employee.map(employee=>{
+                                return <tr key={employee.id}>
+                                            <td>{employee.id}</td>
+                                            <td>{employee.name}</td>
+                                            <td>{employee.doj}</td>
+                                            <td>{employee.dept.deptName}</td>
+                                            <td>{employee.dept.designation}</td>
+                                            <td></td>
+                                        </tr>
+                            })
+                        }
+                    </tbody>
+                </table>    
+            </div>
+        </div>
+    )
+}
+export default EmployeeList;
+
+
+
+
+
+Project Structure 
+-----------------
+backend 
+|
+|---src/main/java
+	|
+	|---com.ihub.www
+	|	
+	|---com.ihub.www.entity
+		|
+		|---User.java
+		|---Employee.java
+		|---Department.java
+
+	|---com.ihub.www.repo	
+		|		
+		|---UserRepository.java
+		|---EmployeeRepository.java
+		|---DepartmentRepository.java 
+	
+	|---com.ihub.www.service
+		|
+		|---AuthService.java
+		|---EmployeeService.java
+
+	|---com.ihub.www.controller
+		|		
+		|---AuthController.java
+		|---EmployeeController.java
+
+	|----com.ihub.www.exception 
+		|
+		|---ResourceNotFoundException.java
+	
+|---src/main/resources
+	|
+	|---application.properties 
+
+|---src/test/java
+|
+|---pom.xml 
+
+
+step34:
+------
+	Create a "Employee.java" file inside "com.ihub.www.entity" package.
+
+Employee.java
+-------------
+package com.ihub.www.entity;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name="employees")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Employee 
+{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column
+	private String name;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
+	private Date doj;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "dept_fk")
+	private Department dept;
+}
+
+
+step35:
+------
+	Create a "Department.java" file inside "com.ihub.www.entity" package.
+
+Department.java
+---------------
+package com.ihub.www.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Department 
+{
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	
+	@Column
+	private String deptName;
+	
+	@Column
+	private String designation;
+}
+
+step36:
+-------
+	Create a EmployeeRepository.java file inside "com.ihub.www.repo" package.
+
+EmployeeRepository.java
+-----------------------
+package com.ihub.www.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.ihub.www.entity.Employee;
+
+@Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Long>
+{
+}
+
+
+step37:
+------
+	Create a DepartmentRepository.java file inside "com.ihub.www.repo" package.
+
+DepartmentRepository.java
+------------------------
+package com.ihub.www.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.ihub.www.entity.Department;
+
+@Repository
+public interface DepartmentRepository  extends JpaRepository<Department, Long>
+{
+}
+
+step38:
+-------
+	Create a ResourceNotFoundException.java file inside "com.ihub.www.exception" pkg.
+
+ResourceNotFoundException.java
+------------------------------
+package com.ihub.www.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+public class ResourceNotFoundException extends RuntimeException
+{
+	public ResourceNotFoundException(String msg)
+	{
+		super(msg);
+	}
+}
+
+step39:
+-------
+	Create a EmployeeServive.java file inside "com.ihub.www.service" package.
+
+EmployeeService.java
+--------------------
+package com.ihub.www.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ihub.www.entity.Employee;
+import com.ihub.www.repo.EmployeeRepository;
+
+@Service
+public class EmployeeService 
+{
+	@Autowired
+	private EmployeeRepository employeeRepository;
+	
+	public Employee addEmployee(Employee employee)
+	{
+		return employeeRepository.save(employee);
+	}
+}
+
+
+step40:
+-------
+	Create a EmployeeController.java file inside "com.ihub.www.controller" package.
+
+EmployeeController.java
+--------------------
+package com.ihub.www.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ihub.www.entity.Employee;
+import com.ihub.www.service.EmployeeService;
+
+@CrossOrigin(origins = "http://localhost:5173")
+@RestController
+@RequestMapping("/api/v1")
+public class EmployeeController 
+{
+	@Autowired
+	private EmployeeService employeeService;
+	
+	@PostMapping("/employee")
+	public Employee addEmployee(@RequestBody Employee employee)
+	{
+		return employeeService.addEmployee(employee);
+	}
+	
+}
+
+step41:
+------
+	Test the application by using below request url.
+	ex:
+		HTTP Method	URL
+		--------	----
+		POST		http://localhost:9191/api/v1/employee
+				Body
+					Raw (JSON)
+				{
+   					"name": "Alan",
+   					"doj": "15-07-2026",
+   					"dept": {
+       							"deptName" : "IT",
+       							"designation": "Developer"
+   						}
+				}		

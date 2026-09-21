@@ -1,0 +1,252 @@
+Project Structure 
+=================
+frontend
+|
+|-----node_modules
+|-----public 
+|-----src	
+	|
+	|---main.jsx
+	|---index.csss
+	|---App.jsx
+	|---App.css
+	|---App.test.jsx
+	|---components
+		|
+		|----Header.jsx
+		|----Login.jsx 
+		|----Footer.jsx
+		|----EmployeeList.jsx 
+ 	
+	|---services
+		|
+		|----AuthService.jsx
+|
+|------package.json
+
+
+step11:
+-------
+	Create a react project i.e frontend.
+	ex:
+		npm create vite@latest 
+step12:
+------
+	Test the application.
+	ex:
+		http://localhost:5173	
+
+step13:
+-------
+	Open a new terminal and switch to the project.
+	ex:
+		cd frontend 
+
+
+step14:
+-------
+	Install Bootstrap, axios and react-router-dom package.
+	ex:
+		npm install bootstrap 
+		npm install axios 
+		npm install react-router-dom 
+
+step15:
+------
+	Import bootstrap inside "main.jsx" file.
+
+main.jsx
+----------
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+import '../node_modules/bootstrap/dist/css/bootstrap.css';
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+step16:
+------
+	Remove all the code from index.css file.
+
+
+step17:
+-------
+	Create a components folder inside "src" folder.
+
+step18:
+-------
+	Create a Header.jsx file inside "src/components" folder.
+
+Header.jsx
+----------
+import {useNavigate} from 'react-router-dom';
+
+function Header()
+{
+    const navigate = useNavigate();
+
+    const handleLogout = (e)=>{
+        e.preventDefault();
+        localStorage.removeItem("logged");
+        navigate('/login')
+    }
+    return(
+        <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <div className="container">
+                <a href="" className="navbar-brand fw-bold"> BridgeSoft </a>
+                {
+                    localStorage.getItem("logged")  &&
+                    <button className="btn btn-primary" onClick={handleLogout}> logout </button>
+                }
+            </div>
+        </nav>
+    )
+}
+export default Header;
+
+step19:
+------
+	Create a "Footer.jsx" file inside "components" folder.
+
+Footer.jsx
+-----------
+import '../App.css';
+function Footer()
+{
+    return(
+        <div className="footer">
+            <small> &copy; All Right Reserved - 2026 </small>
+        </div>
+    )
+}
+export default Footer;
+
+
+step20:
+-------
+	goto App.css file and write below code.
+
+App.css
+-------
+.footer
+{
+   position:absolute;
+   bottom: 0;
+   width:100%;
+   height:30px;
+   background-color: #ecf0f1;
+   color : #000;
+   line-height: 30px;
+   text-align: center;	
+   font-weight : bold;
+}
+
+step21:
+-------
+	Create a Login.jsx file inside "components" folder.
+
+Login.jsx
+---------
+function Login()
+{
+    return(
+        <div className="container mt-5">
+                <h1> Login Component </h1>
+        </div>
+    )
+}
+export default Login;
+
+
+step22:
+------
+	Call Header, Login and Footer component inside routing file i.e App.jsx.
+
+Footer.jsx
+----------
+import '../App.css';
+function Footer()
+{
+    return(
+        <div className="footer">
+            <small> &copy; All Right Reserved - 2026 </small>
+        </div>
+    )
+}
+export default Footer;
+	
+step23:
+-------
+	Test the application.
+	ex:
+		http://localhost:5173/login 
+
+step24:
+------	
+	Create a EmployeeList.jsx file inside "components" folder.
+
+EmployeeList.jsx
+-----------------
+function EmployeeList()
+{
+    return(
+        <div className="container mt-5">
+            Employee List Component 
+        </div>
+    )
+}
+export default EmployeeList;
+
+
+step25:
+------	
+	Add EmployeeList to private router inside routing file i.e App.jsx.
+
+App.jsx
+-------
+import {BrowserRouter,Routes,Route, Navigate} from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Login from './components/Login';
+import EmployeeList from './components/EmployeeList';
+
+function PrivateRouter({children})
+{
+  return localStorage.getItem('logged')? children : <Navigate to="/login"></Navigate>
+}
+
+function App()
+{
+    return(
+      <div>
+          <BrowserRouter>
+            <Header/>
+            <Routes>
+                <Route path='/login' element={<Login/>}></Route>
+                /* protected pages */
+                <Route path='/' element={<PrivateRouter><EmployeeList/></PrivateRouter>}></Route>
+            </Routes>
+            <Footer/>
+          </BrowserRouter>
+      </div>
+    )
+}
+export default App;
+	
+
+
+
+
+
+
+
+
+
+
+
